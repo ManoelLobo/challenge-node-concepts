@@ -50,7 +50,19 @@ app.put("/repositories/:id", (request, response) => {
 });
 
 app.delete("/repositories/:id", (request, response) => {
-  // TODO
+  const { id } = request.params;
+
+  const repositoryIndex = repositories.findIndex(
+    (repository) => repository.id === id
+  );
+
+  if (repositoryIndex < 0) {
+    return response.status(400).json({ error: "Invalid Repository" });
+  }
+
+  repositories.splice(repositoryIndex, 1);
+
+  return response.status(200);
 });
 
 app.post("/repositories/:id/like", (request, response) => {
