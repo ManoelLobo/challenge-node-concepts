@@ -64,8 +64,18 @@ app.delete("/repositories/:id", validateRepositoryId, (request, response) => {
   return response.status(204).json();
 });
 
-app.post("/repositories/:id/like", (request, response) => {
-  // TODO
-});
+app.post(
+  "/repositories/:id/like",
+  validateRepositoryId,
+  (request, response) => {
+    const { repositoryIndex } = request.params;
+
+    const { likes } = repositories[repositoryIndex];
+
+    repositories[repositoryIndex].likes = likes + 1;
+
+    return response.json(repositories[repositoryIndex]);
+  }
+);
 
 module.exports = app;
