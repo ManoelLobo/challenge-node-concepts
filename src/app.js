@@ -10,6 +10,22 @@ app.use(cors());
 
 const repositories = [];
 
+function validateRepositoryId(request, response, next) {
+  const { id } = request.params;
+
+  const repositoryIndex = repositories.findIndex(
+    (repository) => repository.id === id
+  );
+
+  if (repositoryIndex < 0) {
+    return response.status(400).json({ error: "Invalid Repository" });
+  }
+
+  request.params.repositoryIndex = repositoryIndex;
+
+  return next();
+}
+
 app.get("/repositories", (request, response) => {
   return response.json(repositories);
 });
@@ -24,18 +40,9 @@ app.post("/repositories", (request, response) => {
   return response.json(newRepo);
 });
 
-app.put("/repositories/:id", (request, response) => {
-  const { id } = request.params;
-
-  const repositoryIndex = repositories.findIndex(
-    (repository) => repository.id === id
-  );
-
-  if (repositoryIndex < 0) {
-    return response.status(400).json({ error: "Invalid Repository" });
-  }
-
+app.put("/repositories/:id", validateRepositoryId, (request, response) => {
   const { title, url, techs } = request.body;
+  const { repositoryIndex } = request.params;
 
   const newRepositoryInfo = {
     ...repositories[repositoryIndex],
@@ -49,16 +56,8 @@ app.put("/repositories/:id", (request, response) => {
   return response.json(newRepositoryInfo);
 });
 
-app.delete("/repositories/:id", (request, response) => {
-  const { id } = request.params;
-
-  const repositoryIndex = repositories.findIndex(
-    (repository) => repository.id === id
-  );
-
-  if (repositoryIndex < 0) {
-    return response.status(400).json({ error: "Invalid Repository" });
-  }
+app.delete("/repositories/:id", validateRepositoryId, (request, response) => {
+  const { repositoryIndex } = request.params;
 
   repositories.splice(repositoryIndex, 1);
 
