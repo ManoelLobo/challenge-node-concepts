@@ -25,7 +25,28 @@ app.post("/repositories", (request, response) => {
 });
 
 app.put("/repositories/:id", (request, response) => {
-  // TODO
+  const { id } = request.params;
+
+  const repositoryIndex = repositories.findIndex(
+    (repository) => repository.id === id
+  );
+
+  if (repositoryIndex < 0) {
+    return response.status(400).json({ error: "Invalid Repository" });
+  }
+
+  const { title, url, techs } = request.body;
+
+  const newRepositoryInfo = {
+    ...repositories[repositoryIndex],
+    title,
+    url,
+    techs,
+  };
+
+  repositories[repositoryIndex] = newRepositoryInfo;
+
+  return response.json(newRepositoryInfo);
 });
 
 app.delete("/repositories/:id", (request, response) => {
